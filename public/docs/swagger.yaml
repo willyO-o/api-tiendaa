@@ -1,0 +1,645 @@
+openapi: 3.0.0
+info:
+  title: API Documentation
+  description: Documentación de la API con Swagger
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Local Development Server
+tags:
+  - name: Autenticación
+    description: Endpoints para autenticación JWT
+  - name: Categorías
+    description: Endpoints para gestionar categorías
+  - name: Usuarios
+    description: Endpoints para gestionar usuarios
+  - name: Productos
+    description: Endpoints para gestionar productos
+components:
+  schemas:
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        categoria:
+          type: string
+          example: Electrónica
+        estado:
+          type: string
+          enum: [activo, inactivo]
+          example: activo
+        creado_el:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+    CategoriaInput:
+      type: object
+      properties:
+        categoria:
+          type: string
+          example: Electrónica
+        estado:
+          type: string
+          enum: [activo, inactivo]
+          example: activo
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: usuario@example.com
+        estado:
+          type: string
+          enum: [activo, inactivo]
+          example: activo
+        avatar:
+          type: string
+          nullable: true
+          example: https://example.com/avatar.jpg
+        creado_el:
+          type: string
+          format: date-time
+          example: '2023-10-01T12:00:00Z'
+    UsuarioInput:
+      type: object
+      properties:
+        email:
+          type: string
+          example: usuario@example.com
+        password:
+          type: string
+          example: contraseña123
+        estado:
+          type: string
+          enum: [activo, inactivo]
+          example: activo
+        avatar:
+          type: string
+          nullable: true
+          example: https://example.com/avatar.jpg
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Autenticación
+      summary: Iniciar sesión y obtener tokens JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: usuario@example.com
+                password:
+                  type: string
+                  example: contraseña123
+      responses:
+        '200':
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refresh_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Credenciales inválidas
+  /categorias:
+    get:
+      tags:
+        - Categorías
+      summary: Listar todas las categorías
+      parameters:
+        - name: page
+          in: query
+          description: Número de página
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Límite de registros por página
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: Búsqueda por nombre de categoría
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de categorías
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 50
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 10
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Categoria'
+    post:
+      tags:
+        - Categorías
+      summary: Crear una nueva categoría
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaInput'
+      responses:
+        '201':
+          description: Categoría creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Datos inválidos
+  /categorias/{id}:
+    get:
+      tags:
+        - Categorías
+      summary: Obtener una categoría por ID
+      parameters:
+        - name: id
+          in: path
+          description: ID de la categoría
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoría encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '404':
+          description: Categoría no encontrada
+    put:
+      tags:
+        - Categorías
+      summary: Actualizar una categoría por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID de la categoría
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaInput'
+      responses:
+        '200':
+          description: Categoría actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Categoría no encontrada
+    delete:
+      tags:
+        - Categorías
+      summary: Eliminar una categoría por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID de la categoría
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Categoría eliminada
+        '404':
+          description: Categoría no encontrada
+  /usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Listar todos los usuarios
+      parameters:
+        - name: page
+          in: query
+          description: Número de página
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Límite de registros por página
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: Búsqueda por email de usuario
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 50
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 10
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Usuario'
+    post:
+      tags:
+        - Usuarios
+      summary: Crear un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInput'
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Datos inválidos
+  /usuarios/{id}:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          description: ID del usuario
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuario no encontrado
+    put:
+      tags:
+        - Usuarios
+      summary: Actualizar un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          description: ID del usuario
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioInput'
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Usuario no encontrado
+    delete:
+      tags:
+        - Usuarios
+      summary: Eliminar un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          description: ID del usuario
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Usuario eliminado
+        '404':
+          description: Usuario no encontrado
+  /productos:
+    get:
+      tags:
+        - Productos
+      summary: Listar todos los productos
+      parameters:
+        - name: page
+          in: query
+          description: Número de página
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Límite de registros por página
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: Búsqueda por nombre de producto
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 50
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 10
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nombre:
+                          type: string
+                          example: iPhone 13
+                        descripcion:
+                          type: string
+                          example: Nuevo iPhone 13
+                        imagen:
+                          type: array
+                          items:
+                            type: string
+                          example: ['https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg']
+                        precio:
+                          type: number
+                          example: 999.99
+                        stock:
+                          type: integer
+                          example: 100
+                        estado:
+                          type: string
+                          enum: [activo, inactivo]
+                          example: activo
+                        categoria_id:
+                          type: integer
+                          example: 1
+                        creado_el:
+                          type: string
+                          format: date-time
+                          example: '2023-10-01T12:00:00Z'
+
+    post:
+      tags:
+        - Productos
+      summary: Crear un nuevo producto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: iPhone 13
+                descripcion:
+                  type: string
+                  example: Nuevo iPhone 13
+                imagen:
+                  type: array
+                  example: ['https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg']
+                precio:
+                  type: number
+                  example: 999.99
+                stock:
+                  type: integer
+                  example: 100
+                categoria_id:
+                  type: integer
+                  example: 1
+      responses:
+        '201':
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  nombre:
+                    type: string
+                    example: iPhone 13
+                  precio:
+                    type: number
+                    example: 999.99
+                  estado:
+                    type: string
+                    enum: [activo, inactivo]
+                    example: activo
+                  creado_el:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T12:00:00Z'
+        '400':
+          description: Datos inválidos
+  /productos/{id}:
+    get:
+      tags:
+        - Productos
+      summary: Obtener un producto por ID
+      parameters:
+        - name: id
+          in: path
+          description: ID del producto
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  nombre:
+                    type: string
+                    example: iPhone 13
+                  precio:
+                    type: number
+                    example: 999.99
+                  estado:
+                    type: string
+                    enum: [activo, inactivo]
+                    example: activo
+                  creado_el:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T12:00:00Z'
+        '404':
+          description: Producto no encontrado
+    put:
+      tags:
+        - Productos
+      summary: Actualizar un producto por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID del producto
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: iPhone 13
+                descripcion:
+                  type: string
+                  example: Nuevo iPhone 13
+                imagen:
+                  type: array
+                  example: ['https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg']
+                precio:
+                  type: number
+                  example: 999.99
+                stock:
+                  type: integer
+                  example: 100
+                categoria_id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  nombre:
+                    type: string
+                    example: iPhone 13
+                  precio:
+                    type: number
+                    example: 999.99
+                  estado:
+                    type: string
+                    enum: [activo, inactivo]
+                    example: activo
+                  creado_el:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T12:00:00Z'
+        '400':
+          description: Datos inválidos
+        '404':
+          description: Producto no encontrado
+    delete:
+      tags:
+        - Productos
+      summary: Eliminar un producto por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID del producto
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Producto eliminado
+        '404':
+          description: Producto no encontrado
