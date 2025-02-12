@@ -35,7 +35,7 @@ class ProductoModel extends Model
         // regla de validacion para json array
         'imagen' => 'permit_empty|valid_json',
         'precio' => 'required|decimal',
-        'stock' => 'required|integer',
+        'stock' => 'integer|required',
         'categoria_id' => 'required|integer',
     ];
     protected $validationMessages = [

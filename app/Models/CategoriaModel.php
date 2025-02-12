@@ -29,6 +29,7 @@ class CategoriaModel extends Model
     protected $deletedField  = '';
     // Validation
     protected $validationRules = [
+        'id' => 'permit_empty|integer',
         'categoria' => 'required|max_length[255]|is_unique[categorias.categoria,id,{id}]',
         'estado' => 'required|in_list[activo,inactivo]',
     ];

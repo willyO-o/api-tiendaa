@@ -20,7 +20,10 @@ class CategoriaController extends ResourceController
         }
 
         $total = $builder->countAllResults(false);
-        $categorias = $builder->get($limit, ($page - 1) * $limit)->getResult();
+        $categorias = $builder
+            ->orderBy('id', 'DESC')
+            ->get($limit, ($page - 1) * $limit)
+            ->getResult();
 
         return $this->respond([
             'total' => $total,
@@ -42,7 +45,7 @@ class CategoriaController extends ResourceController
     }
 
     // Endpoint protegido para crear una nueva categoría
-        /**
+    /**
      * Create a new resource object, from "posted" parameters.
      *
      * @return ResponseInterface
@@ -69,6 +72,8 @@ class CategoriaController extends ResourceController
     {
         $data = $this->request->getJSON(true);
 
+
+
         // Validar datos
         if (!isset($data['categoria']) && !isset($data['estado'])) {
             return $this->failValidationErrors('Datos incompletos');
@@ -79,7 +84,12 @@ class CategoriaController extends ResourceController
             return $this->failNotFound('Categoría no encontrada');
         }
 
-        $this->model->update($id, $data);
+
+        if ($this->model->update($id, $data) === false) {
+            return $this->fail($this->model->errors());
+        }
+
+
 
         return $this->respondUpdated([
             'message' => 'Categoría actualizada',

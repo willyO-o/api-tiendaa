@@ -84,7 +84,12 @@ class ProductoController extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
-        $this->model->insert($data);
+
+        if(!$this->model->insert($data)){
+            return $this->fail($this->model->errors());
+        }
+
+
 
         return $this->respondCreated(['message' => 'Producto creado']);
     }
