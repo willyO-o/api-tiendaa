@@ -29,6 +29,7 @@ class UsuarioModel extends Model
 
     // Validation
     protected $validationRules = [
+        'id' => 'permit_empty|integer',
         'email' => 'required|valid_email|is_unique[usuarios.email,id,{id}]',
         'password' => 'required|min_length[6]',
         'estado' => 'required|in_list[activo,inactivo]',
