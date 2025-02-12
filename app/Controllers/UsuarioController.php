@@ -69,10 +69,18 @@ class UsuarioController extends ResourceController
     {
         $data = $this->request->getJSON(true);
 
-        // Validar datos
-        if (!isset($data['email']) && !isset($data['password']) && !isset($data['estado']) && !isset($data['avatar'])) {
-            return $this->failValidationErrors('Datos incompletos');
+
+        if ($id == 1) {
+            return $this->respondUpdated([
+                'message' => 'No se puede modificar el usuario administrador',
+                'data' => $this->model->find($id),
+            ]);
         }
+
+        // Validar datos
+        // if (!isset($data['email']) && !isset($data['password']) && !isset($data['estado']) && !isset($data['avatar'])) {
+        //     return $this->failValidationErrors('Datos incompletos');
+        // }
 
         $usuario = $this->model->find($id);
         if (!$usuario) {
@@ -96,6 +104,14 @@ class UsuarioController extends ResourceController
     public function delete($id = null)
     {
         $usuario = $this->model->find($id);
+
+        if ($id == 1) {
+            return $this->respondDeleted([
+                'message' => 'No se puede eliminar el usuario administrador',
+                'data' => $this->model->find($id),
+            ]);
+        }
+
         if (!$usuario) {
             return $this->failNotFound('Usuario no encontrado');
         }

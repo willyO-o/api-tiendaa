@@ -74,6 +74,14 @@ class Filters extends BaseFilters
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
+            // 'cors'=> [
+            //     'except' => [
+            //         //excepto las rutas prodcutos/{id}
+            //         'api/v1/productos/(:segment)',
+            //         'api/v1/categorias/(:segment)',
+            //     ]
+            // ]
+            'cors',
         ],
         'after' => [
             // 'honeypot',

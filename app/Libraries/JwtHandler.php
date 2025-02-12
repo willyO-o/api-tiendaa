@@ -18,6 +18,8 @@ class JwtHandler
 
     public function validateToken($token)
     {
+        $this->key = env('JWT_SECRET');
+
         try {
             return JWT::decode($token, new Key($this->key, $this->algorithm));
         } catch (\Exception $e) {

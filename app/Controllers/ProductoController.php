@@ -20,6 +20,7 @@ class ProductoController extends ResourceController
         $page = $this->request->getVar('page') ?? 1;
         $limit = $this->request->getVar('limit') ?? 10;
         $search = $this->request->getVar('search');
+        $categoria = $this->request->getVar('categoria_id');
 
         $builder = $this->model->builder();
         $builder->join('categorias c', 'c.id = productos.categoria_id');
@@ -28,8 +29,17 @@ class ProductoController extends ResourceController
             $builder->like('titulo', $search)->orLike('descripcion', $search);
         }
 
+        if ($categoria) {
+            $builder->where('categoria_id', $categoria);
+        }
+
         $total = $builder->countAllResults(false);
+        $builder->orderBy('productos.id', 'DESC');
+        $builder->select('productos.*, categoria');
         $productos = $builder->get($limit, ($page - 1) * $limit)->getResult();
+
+        // last query
+        // dd($this->model->getLastQuery());
 
         return $this->respond([
             'total' => $total,
@@ -48,7 +58,7 @@ class ProductoController extends ResourceController
      */
     public function show($id = null)
     {
-        $producto = $this->model->find($id);
+        $producto = $this->model->join('categorias c', 'c.id = productos.categoria_id')->select('productos.*, categoria')->find($id);
         if (!$producto) {
             return $this->failNotFound('Producto no encontrado');
         }

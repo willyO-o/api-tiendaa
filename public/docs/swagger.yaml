@@ -4,17 +4,17 @@ info:
   description: Documentación de la API con Swagger
   version: 1.0.0
 servers:
-  - url: /api/v1
-    description: Local Development Server
+- url: /api/v1
+  description: Local Development Server
 tags:
-  - name: Autenticación
-    description: Endpoints para autenticación JWT
-  - name: Categorías
-    description: Endpoints para gestionar categorías
-  - name: Usuarios
-    description: Endpoints para gestionar usuarios
-  - name: Productos
-    description: Endpoints para gestionar productos
+- name: Autenticación
+  description: Endpoints para autenticación JWT
+- name: Categorías
+  description: Endpoints para gestionar categorías
+- name: Usuarios
+  description: Endpoints para gestionar usuarios
+- name: Productos
+  description: Endpoints para gestionar productos
 components:
   schemas:
     Categoria:
@@ -28,7 +28,7 @@ components:
           example: Electrónica
         estado:
           type: string
-          enum: [activo, inactivo]
+          enum: [ activo, inactivo ]
           example: activo
         creado_el:
           type: string
@@ -42,7 +42,7 @@ components:
           example: Electrónica
         estado:
           type: string
-          enum: [activo, inactivo]
+          enum: [ activo, inactivo ]
           example: activo
     Usuario:
       type: object
@@ -52,10 +52,10 @@ components:
           example: 1
         email:
           type: string
-          example: usuario@example.com
+          example: administrador@gmail.com
         estado:
           type: string
-          enum: [activo, inactivo]
+          enum: [ activo, inactivo ]
           example: activo
         avatar:
           type: string
@@ -70,28 +70,31 @@ components:
       properties:
         email:
           type: string
-          example: usuario@example.com
+          example: administrador@gmail.com
         password:
           type: string
-          example: contraseña123
+          example: 123456
         estado:
           type: string
-          enum: [activo, inactivo]
+          enum: [ activo, inactivo ]
           example: activo
         avatar:
           type: string
           nullable: true
           example: https://example.com/avatar.jpg
-securitySchemes:
-  bearerAuth:
-    type: http
-    scheme: bearer
-    bearerFormat: JWT
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Ingrese el token JWT en el campo de entrada a continuación
+  security:
+  - bearerAuth: []
 paths:
   /auth/login:
     post:
       tags:
-        - Autenticación
+      - Autenticación
       summary: Iniciar sesión y obtener tokens JWT
       requestBody:
         required: true
@@ -102,10 +105,94 @@ paths:
               properties:
                 email:
                   type: string
-                  example: usuario@example.com
+                  example: administrador@gmail.com
                 password:
                   type: string
-                  example: contraseña123
+                  example: 123456
+      responses:
+        '200':
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: Object
+                    properties:
+                      token:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      expires:
+                        type: integer
+                        example: 1739358593
+                      expires_date:
+                        type: string
+                        example: 2023-10-01 12:00:00
+                  refresh_token:
+                    type: Object
+                    properties:
+                      token:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      expires:
+                        type: integer
+                        example: 1739358593
+                      expires_date:
+                        type: string
+                        example: 2023-10-01 12:00:00
+
+        '401':
+          description: Credenciales inválidas
+  /auth/me:
+    get:
+      tags:
+      - Autenticación
+      summary: Obtener información del usuario autenticado
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Información del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  email:
+                    type: string
+                    example: administrador@gmail.com
+                  estado:
+                    type: string
+                    enum: [ activo, inactivo ]
+                    example: activo
+                  avatar:
+                    type: string
+                    nullable: true
+                    example: https://example.com/avatar.jpg
+                  creado_el:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01 12:00:00'
+  /auth/refresh:
+    post:
+      tags:
+      - Autenticación
+      summary: Refrescar token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
       responses:
         '200':
           description: Inicio de sesión exitoso
@@ -117,34 +204,62 @@ paths:
                   access_token:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  refresh_token:
+
+        '401':
+          description: Credenciales inválidas o token expirado
+  /auth/logout:
+    post:
+      tags:
+      - Autenticación
+      summary: Cerrar sesión y eliminar tokens JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+      responses:
+        '200':
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
         '401':
-          description: Credenciales inválidas
+          description: Credenciales inválidas o token expirado
   /categorias:
     get:
       tags:
-        - Categorías
+      - Categorías
       summary: Listar todas las categorías
       parameters:
-        - name: page
-          in: query
-          description: Número de página
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: Límite de registros por página
-          schema:
-            type: integer
-            default: 10
-        - name: search
-          in: query
-          description: Búsqueda por nombre de categoría
-          schema:
-            type: string
+      - name: page
+        in: query
+        description: Número de página
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        description: Límite de registros por página
+        schema:
+          type: integer
+          default: 10
+      - name: search
+        in: query
+        description: Búsqueda por nombre de categoría
+        schema:
+          type: string
       responses:
         '200':
           description: Lista de categorías
@@ -168,10 +283,10 @@ paths:
                       $ref: '#/components/schemas/Categoria'
     post:
       tags:
-        - Categorías
+      - Categorías
       summary: Crear una nueva categoría
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -190,15 +305,15 @@ paths:
   /categorias/{id}:
     get:
       tags:
-        - Categorías
+      - Categorías
       summary: Obtener una categoría por ID
       parameters:
-        - name: id
-          in: path
-          description: ID de la categoría
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID de la categoría
+        required: true
+        schema:
+          type: integer
       responses:
         '200':
           description: Categoría encontrada
@@ -210,17 +325,17 @@ paths:
           description: Categoría no encontrada
     put:
       tags:
-        - Categorías
+      - Categorías
       summary: Actualizar una categoría por ID
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: ID de la categoría
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID de la categoría
+        required: true
+        schema:
+          type: integer
       requestBody:
         required: true
         content:
@@ -240,17 +355,17 @@ paths:
           description: Categoría no encontrada
     delete:
       tags:
-        - Categorías
+      - Categorías
       summary: Eliminar una categoría por ID
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: ID de la categoría
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID de la categoría
+        required: true
+        schema:
+          type: integer
       responses:
         '204':
           description: Categoría eliminada
@@ -259,26 +374,26 @@ paths:
   /usuarios:
     get:
       tags:
-        - Usuarios
+      - Usuarios
       summary: Listar todos los usuarios
       parameters:
-        - name: page
-          in: query
-          description: Número de página
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: Límite de registros por página
-          schema:
-            type: integer
-            default: 10
-        - name: search
-          in: query
-          description: Búsqueda por email de usuario
-          schema:
-            type: string
+      - name: page
+        in: query
+        description: Número de página
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        description: Límite de registros por página
+        schema:
+          type: integer
+          default: 10
+      - name: search
+        in: query
+        description: Búsqueda por email de usuario
+        schema:
+          type: string
       responses:
         '200':
           description: Lista de usuarios
@@ -302,8 +417,10 @@ paths:
                       $ref: '#/components/schemas/Usuario'
     post:
       tags:
-        - Usuarios
+      - Usuarios
       summary: Crear un nuevo usuario
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -322,15 +439,17 @@ paths:
   /usuarios/{id}:
     get:
       tags:
-        - Usuarios
+      - Usuarios
       summary: Obtener un usuario por ID
+      security:
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: ID del usuario
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID del usuario
+        required: true
+        schema:
+          type: integer
       responses:
         '200':
           description: Usuario encontrado
@@ -342,15 +461,17 @@ paths:
           description: Usuario no encontrado
     put:
       tags:
-        - Usuarios
+      - Usuarios
       summary: Actualizar un usuario por ID
+      security:
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: ID del usuario
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID del usuario
+        required: true
+        schema:
+          type: integer
       requestBody:
         required: true
         content:
@@ -370,15 +491,17 @@ paths:
           description: Usuario no encontrado
     delete:
       tags:
-        - Usuarios
+      - Usuarios
       summary: Eliminar un usuario por ID
+      security:
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: ID del usuario
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID del usuario
+        required: true
+        schema:
+          type: integer
       responses:
         '204':
           description: Usuario eliminado
@@ -387,26 +510,31 @@ paths:
   /productos:
     get:
       tags:
-        - Productos
+      - Productos
       summary: Listar todos los productos
       parameters:
-        - name: page
-          in: query
-          description: Número de página
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: Límite de registros por página
-          schema:
-            type: integer
-            default: 10
-        - name: search
-          in: query
-          description: Búsqueda por nombre de producto
-          schema:
-            type: string
+      - name: page
+        in: query
+        description: Número de página
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        description: Límite de registros por página
+        schema:
+          type: integer
+          default: 10
+      - name: search
+        in: query
+        description: Búsqueda por nombre de producto
+        schema:
+          type: string
+      - name: categoria_id
+        in: query
+        description: Filtrar por ID de categoría
+        schema:
+          type: integer
       responses:
         '200':
           description: Lista de productos
@@ -442,7 +570,7 @@ paths:
                           type: array
                           items:
                             type: string
-                          example: ['https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg']
+                          example: [ 'https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg' ]
                         precio:
                           type: number
                           example: 999.99
@@ -451,7 +579,7 @@ paths:
                           example: 100
                         estado:
                           type: string
-                          enum: [activo, inactivo]
+                          enum: [ activo, inactivo ]
                           example: activo
                         categoria_id:
                           type: integer
@@ -463,10 +591,10 @@ paths:
 
     post:
       tags:
-        - Productos
+      - Productos
       summary: Crear un nuevo producto
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -482,7 +610,7 @@ paths:
                   example: Nuevo iPhone 13
                 imagen:
                   type: array
-                  example: ['https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg']
+                  example: [ 'https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg' ]
                 precio:
                   type: number
                   example: 999.99
@@ -511,7 +639,7 @@ paths:
                     example: 999.99
                   estado:
                     type: string
-                    enum: [activo, inactivo]
+                    enum: [ activo, inactivo ]
                     example: activo
                   creado_el:
                     type: string
@@ -522,15 +650,15 @@ paths:
   /productos/{id}:
     get:
       tags:
-        - Productos
+      - Productos
       summary: Obtener un producto por ID
       parameters:
-        - name: id
-          in: path
-          description: ID del producto
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID del producto
+        required: true
+        schema:
+          type: integer
       responses:
         '200':
           description: Producto encontrado
@@ -550,7 +678,7 @@ paths:
                     example: 999.99
                   estado:
                     type: string
-                    enum: [activo, inactivo]
+                    enum: [ activo, inactivo ]
                     example: activo
                   creado_el:
                     type: string
@@ -560,17 +688,17 @@ paths:
           description: Producto no encontrado
     put:
       tags:
-        - Productos
+      - Productos
       summary: Actualizar un producto por ID
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: ID del producto
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID del producto
+        required: true
+        schema:
+          type: integer
       requestBody:
         required: true
         content:
@@ -586,7 +714,7 @@ paths:
                   example: Nuevo iPhone 13
                 imagen:
                   type: array
-                  example: ['https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg']
+                  example: [ 'https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg' ]
                 precio:
                   type: number
                   example: 999.99
@@ -615,7 +743,7 @@ paths:
                     example: 999.99
                   estado:
                     type: string
-                    enum: [activo, inactivo]
+                    enum: [ activo, inactivo ]
                     example: activo
                   creado_el:
                     type: string
@@ -627,17 +755,17 @@ paths:
           description: Producto no encontrado
     delete:
       tags:
-        - Productos
+      - Productos
       summary: Eliminar un producto por ID
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: ID del producto
-          required: true
-          schema:
-            type: integer
+      - name: id
+        in: path
+        description: ID del producto
+        required: true
+        schema:
+          type: integer
       responses:
         '204':
           description: Producto eliminado

@@ -44,6 +44,16 @@ class JwtFilter implements FilterInterface
             return service('response')->setStatusCode(401)->setJSON(['error' => 'Token inválido']);
         }
 
+        //verificar el token en la base de datos
+        $tokenModel = model('AutorizacionTokenModel');
+        $tokenData = $tokenModel->where('token', $token)->where('esta_activo', 1)->where('tipo', 'access')->where('expira_el >', date('Y-m-d H:i:s',now()))->first();
+        if (!$tokenData) {
+            return service('response')->setStatusCode(401)->setJSON(['error' => 'Token no válido o expirado']);
+        }
+
+        //guardar el id del usuario en la solicitud
+
+        $request->setHeader('user_id', $decoded->id);
         // return $next($request);
 
     }
