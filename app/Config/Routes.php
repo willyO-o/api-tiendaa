@@ -6,7 +6,8 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', function () {
-    redirect('documentation');
+    return redirect()->to('swagger-ui.html');
+    
 });
 
 
