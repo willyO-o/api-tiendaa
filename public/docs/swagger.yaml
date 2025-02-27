@@ -222,19 +222,17 @@ paths:
                 refresh_token:
                   type: string
                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
       responses:
         '200':
-          description: Inicio de sesión exitoso
+          description: Sesión cerrada
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  access_token:
+                  message:
                     type: string
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
+                    example: Sesión cerrada
         '401':
           description: Credenciales inválidas o token expirado
   /categorias:
@@ -560,7 +558,7 @@ paths:
                         id:
                           type: integer
                           example: 1
-                        nombre:
+                        titulo:
                           type: string
                           example: iPhone 13
                         descripcion:
@@ -602,15 +600,15 @@ paths:
             schema:
               type: object
               properties:
-                nombre:
+                titulo:
                   type: string
                   example: iPhone 13
                 descripcion:
                   type: string
                   example: Nuevo iPhone 13
                 imagen:
-                  type: array
-                  example: [ 'https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg' ]
+                  type: json
+                  example: '["https:\/\/cdnx.jumpseller.com\/kadrihel1\/image\/39075964\/resize\/635\/635?1693415938","https:\/\/encrypted-tbn0.gstatic.com\/images?q=tbn:ANd9GcRh_U-mBlGNXylsj4G7Ryqd_m_l_P_OHIhUzb4UE5vF8JZ_X12lHvOpDNP88m7pTsqrzpw&usqp=CAU"]'''
                 precio:
                   type: number
                   example: 999.99
@@ -631,7 +629,7 @@ paths:
                   id:
                     type: integer
                     example: 1
-                  nombre:
+                  titulo:
                     type: string
                     example: iPhone 13
                   precio:
@@ -670,7 +668,7 @@ paths:
                   id:
                     type: integer
                     example: 1
-                  nombre:
+                  titulo:
                     type: string
                     example: iPhone 13
                   precio:
@@ -706,15 +704,15 @@ paths:
             schema:
               type: object
               properties:
-                nombre:
+                titulo:
                   type: string
                   example: iPhone 13
                 descripcion:
                   type: string
                   example: Nuevo iPhone 13
                 imagen:
-                  type: array
-                  example: [ 'https://example.com/iphone13.jpg', 'https://example.com/iphone13-2.jpg' ]
+                  type: json
+                  example: '["https:\/\/cdnx.jumpseller.com\/kadrihel1\/image\/39075964\/resize\/635\/635?1693415938","https:\/\/encrypted-tbn0.gstatic.com\/images?q=tbn:ANd9GcRh_U-mBlGNXylsj4G7Ryqd_m_l_P_OHIhUzb4UE5vF8JZ_X12lHvOpDNP88m7pTsqrzpw&usqp=CAU"]'''
                 precio:
                   type: number
                   example: 999.99
@@ -735,9 +733,15 @@ paths:
                   id:
                     type: integer
                     example: 1
-                  nombre:
+                  titulo:
                     type: string
                     example: iPhone 13
+                  descripcion:
+                    type: string
+                    example: Nuevo iPhone 13
+                  imagen:
+                    type: json
+                    example: '["https:\/\/cdnx.jumpseller.com\/kadrihel1\/image\/39075964\/resize\/635\/635?1693415938","https:\/\/encrypted-tbn0.gstatic.com\/images?q=tbn:ANd9GcRh_U-mBlGNXylsj4G7Ryqd_m_l_P_OHIhUzb4UE5vF8JZ_X12lHvOpDNP88m7pTsqrzpw&usqp=CAU"]'''
                   precio:
                     type: number
                     example: 999.99
