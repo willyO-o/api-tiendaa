@@ -33,22 +33,41 @@ class JwtFilter implements FilterInterface
 
         $this->jwt = new JwtHandler();
 
+        
         $authHeader = $request->getServer('HTTP_AUTHORIZATION');
+
+        //evitar que los tipo options soliciten el token 
+
+        // return var_dump($request->getMethod());
+        if ($request->getMethod() === 'OPTIONS') {
+            return service('response')->setStatusCode(200)->setJSON(['message' => 'ok']);
+        }
+
         if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-            return service('response')->setStatusCode(401)->setJSON(['error' => 'Token no proporcionado']);
+            return service('response')->setHeader('Content-Type', 'application/json')->setHeader('Access-Control-Allow-Origin', '*')
+                ->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type')
+                ->setHeader('Access-Control-Allow-Credentials', 'true')
+            ->setStatusCode(401)->setJSON(['error' => 'Token no proporcionado']);
         }
 
         $token = $matches[1];
         $decoded = $this->jwt->validateToken($token);
         if (!$decoded) {
-            return service('response')->setStatusCode(401)->setJSON(['error' => 'Token inválido']);
+                        return service('response')->setHeader('Content-Type', 'application/json')->setHeader('Access-Control-Allow-Origin', '*')
+                ->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type')
+                ->setHeader('Access-Control-Allow-Credentials', 'true')->setStatusCode(401)->setJSON(['error' => 'Token inválido']);
         }
 
         //verificar el token en la base de datos
         $tokenModel = model('AutorizacionTokenModel');
         $tokenData = $tokenModel->where('token', $token)->where('esta_activo', 1)->where('tipo', 'access')->where('expira_el >', date('Y-m-d H:i:s',now()))->first();
         if (!$tokenData) {
-            return service('response')->setStatusCode(401)->setJSON(['error' => 'Token no válido o expirado']);
+                        return service('response')->setHeader('Content-Type', 'application/json')->setHeader('Access-Control-Allow-Origin', '*')
+                ->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type')
+                ->setHeader('Access-Control-Allow-Credentials', 'true')->setStatusCode(401)->setJSON(['error' => 'Token no válido o expirado']);
         }
 
         //guardar el id del usuario en la solicitud
@@ -72,6 +91,10 @@ class JwtFilter implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        //
+        return $response
+            ->setHeader('Access-Control-Allow-Origin', '*')
+            ->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type')
+            ->setHeader('Access-Control-Allow-Credentials', 'true');
     }
 }
