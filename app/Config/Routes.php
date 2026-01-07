@@ -7,12 +7,11 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', function () {
     return redirect()->to('swagger-ui.html');
-    
 });
 
 
 
-$routes->group('api/v1', ['namespace' => 'App\Controllers', 'filter'=>'cors'], function ($routes) {
+$routes->group('api/v1', ['namespace' => 'App\Controllers', 'filter' => 'cors'], function ($routes) {
 
     $routes->options('(:any)', static function () {
         // Establecer los encabezados CORS
@@ -21,7 +20,7 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers', 'filter'=>'cors'], f
         $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE,PATCH');
         $response->setHeader('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
         $response->setHeader('Access-Control-Allow-Credentials', 'true');
-    
+
         // Enviar una respuesta vacía con un estado 204 No Content
         return $response->setStatusCode(204)->setBody('');
     });
@@ -38,8 +37,8 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers', 'filter'=>'cors'], f
     $routes->get('usuarios', 'UsuarioController::index');
     $routes->get('categorias', 'CategoriaController::index');
 
-        // Endpoints públicos de contacto
-        $routes->post('contactos', 'ContactoController::create');
+    // Endpoints públicos de contacto
+    $routes->post('contactos', 'ContactoController::create');
 
 
     // Protegidos

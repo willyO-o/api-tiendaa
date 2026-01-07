@@ -842,8 +842,8 @@ paths:
                   type: string
                   example: Nuevo iPhone 13
                 imagen:
-                  type: json
-                  example: '["https:\/\/cdnx.jumpseller.com\/kadrihel1\/image\/39075964\/resize\/635\/635?1693415938","https:\/\/encrypted-tbn0.gstatic.com\/images?q=tbn:ANd9GcRh_U-mBlGNXylsj4G7Ryqd_m_l_P_OHIhUzb4UE5vF8JZ_X12lHvOpDNP88m7pTsqrzpw&usqp=CAU"]'''
+                  type: string
+                  example: '["https://cdnx.jumpseller.com/kadrihel1/image/39075964/resize/635/635?1693415938","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRh_U-mBlGNXylsj4G7Ryqd_m_l_P_OHIhUzb4UE5vF8JZ_X12lHvOpDNP88m7pTsqrzpw&usqp=CAU"]'
                 precio:
                   type: number
                   example: 999.99
