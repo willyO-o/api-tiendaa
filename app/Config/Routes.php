@@ -38,12 +38,22 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers', 'filter'=>'cors'], f
     $routes->get('usuarios', 'UsuarioController::index');
     $routes->get('categorias', 'CategoriaController::index');
 
+        // Endpoints públicos de contacto
+        $routes->post('contactos', 'ContactoController::create');
+
+
     // Protegidos
     $routes->group('', ['filter' => 'jwt'], function ($routes) {
         // $routes->group('',  function ($routes) {
         $routes->resource('productos', ['controller' => 'ProductoController']);
         $routes->resource('usuarios', ['controller' => 'UsuarioController']);
         $routes->resource('categorias', ['controller' => 'CategoriaController']);
+
+        // Endpoints protegidos de contacto
+        $routes->get('contactos', 'ContactoController::index');
+        $routes->get('contactos/(:num)', 'ContactoController::show/$1');
+        $routes->put('contactos/(:num)', 'ContactoController::update/$1');
+        $routes->delete('contactos/(:num)', 'ContactoController::delete/$1');
 
         $routes->get('auth/me', 'AuthController::me');
     });

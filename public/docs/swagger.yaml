@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: API Documentation
-  description: Documentación de la API con Swagger
+  description: 'Documentación de la API con Swagger. Base URL: https://shop.preparateaqui.com/api/v1'
   version: 1.0.0
 servers:
-- url: /api/v1
-  description: Local Development Server
+- url: https://shop.preparateaqui.com/api/v1
+  description: Production Server
 tags:
 - name: Autenticación
   description: Endpoints para autenticación JWT
@@ -15,6 +15,8 @@ tags:
   description: Endpoints para gestionar usuarios
 - name: Productos
   description: Endpoints para gestionar productos
+- name: Contactos
+  description: Endpoints para gestionar formularios de contacto
 components:
   schemas:
     Categoria:
@@ -82,15 +84,248 @@ components:
           type: string
           nullable: true
           example: https://example.com/avatar.jpg
+    Contacto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre_completo:
+          type: string
+          example: Juan Pérez
+        correo:
+          type: string
+          example: juan@example.com
+        mensaje:
+          type: string
+          example: Me interesa conocer más sobre sus productos
+        estado:
+          type: string
+          enum: [ pendiente, leido, papelera ]
+          example: pendiente
+        fecha_registro:
+          type: string
+          format: date-time
+          example: '2026-01-07 10:30:00'
+        fecha_actualizacion:
+          type: string
+          format: date-time
+          example: '2026-01-07 10:30:00'
+    ContactoInput:
+      type: object
+      properties:
+        nombre_completo:
+          type: string
+          example: Juan Pérez
+        correo:
+          type: string
+          example: juan@example.com
+        mensaje:
+          type: string
+          example: Me interesa conocer más sobre sus productos
+    ContactoUpdate:
+      type: object
+      properties:
+        nombre_completo:
+          type: string
+          example: Juan Pérez
+        correo:
+          type: string
+          example: juan@example.com
+        mensaje:
+          type: string
+          example: Me interesa conocer más sobre sus productos
+        estado:
+          type: string
+          enum: [ pendiente, leido, papelera ]
+          example: leido
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
       description: Ingrese el token JWT en el campo de entrada a continuación
-  security:
+security:
   - bearerAuth: []
 paths:
+  /contactos:
+    post:
+      tags:
+      - Contactos
+      summary: Registrar un nuevo contacto (público, sin autenticación)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactoInput'
+      responses:
+        '201':
+          description: Contacto registrado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Contacto registrado correctamente
+        '400':
+          description: Faltan campos requeridos
+    get:
+      tags:
+      - Contactos
+      summary: Listar todos los contactos
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: page
+        in: query
+        description: Número de página
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        description: Límite de registros por página
+        schema:
+          type: integer
+          default: 10
+      - name: search
+        in: query
+        description: Búsqueda por nombre, correo o mensaje
+        schema:
+          type: string
+      - name: estado
+        in: query
+        description: Filtro por estado
+        schema:
+          type: string
+          enum: [ pendiente, leido, papelera ]
+      - name: fecha_desde
+        in: query
+        description: Filtro de fecha desde (formato YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+      - name: fecha_hasta
+        in: query
+        description: Filtro de fecha hasta (formato YYYY-MM-DD)
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Lista de contactos con paginación
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 25
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 10
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Contacto'
+        '401':
+          description: Token no válido o no proporcionado
+  /contactos/{id}:
+    get:
+      tags:
+      - Contactos
+      summary: Obtener un contacto por ID
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: ID del contacto
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Detalles del contacto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contacto'
+        '404':
+          description: Contacto no encontrado
+        '401':
+          description: Token no válido o no proporcionado
+    put:
+      tags:
+      - Contactos
+      summary: Actualizar un contacto por ID
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: ID del contacto
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactoUpdate'
+      responses:
+        '200':
+          description: Contacto actualizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Contacto actualizado correctamente
+        '400':
+          description: Datos insuficientes
+        '404':
+          description: Contacto no encontrado
+        '401':
+          description: Token no válido o no proporcionado
+    delete:
+      tags:
+      - Contactos
+      summary: Eliminar un contacto por ID
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: ID del contacto
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Contacto eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Contacto eliminado correctamente
+        '404':
+          description: Contacto no encontrado
+        '401':
+          description: Token no válido o no proporcionado
   /auth/login:
     post:
       tags:
