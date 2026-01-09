@@ -30,7 +30,7 @@ class AuthController extends ResourceController
             $payload = [
                 'id' => $user['id'],
                 'iat' => now(),
-                'exp' => Time::now()->addHours(8)->getTimestamp(),
+                'exp' => Time::now()->addSeconds(60)->getTimestamp(),
             ];
 
             $accessToken = $this->jwt->generateToken($payload);
@@ -38,7 +38,7 @@ class AuthController extends ResourceController
             $idInsert = $this->autorizacionTokenModel->insert([
                 'token' => $accessToken,
                 'usuario_id' => $user['id'],
-                'expira_el' =>  Time::now()->addHours(8)->toDateTimeString(),
+                'expira_el' =>  Time::now()->addSeconds(60)->toDateTimeString(),
                 'esta_activo' => 1,
                 'tipo' => 'access',
             ]);
@@ -47,13 +47,13 @@ class AuthController extends ResourceController
                 return $this->fail('No se pudo generar el token de acceso');
             }
 
-            $payload['exp'] = Time::now()->addDays(7)->getTimestamp();
+            $payload['exp'] = Time::now()->addHours(2)->getTimestamp(); // 7 días
             $refreshToken = $this->jwt->generateToken($payload);
 
             $idInsert = $this->autorizacionTokenModel->insert([
                 'token' => $refreshToken,
                 'usuario_id' => $user['id'],
-                'expira_el' => Time::now()->addDays(7)->toDateTimeString(),
+                'expira_el' => Time::now()->addHours(2)->toDateTimeString(),
                 'esta_activo' => 1,
                 'tipo' => 'refresh',
             ]);
@@ -65,13 +65,13 @@ class AuthController extends ResourceController
             return $this->respond([
                 'access_token' => [
                     'token' => $accessToken,
-                    'expires' => Time::now()->addHours(8)->getTimestamp(),
-                    'expires_date' => Time::now()->addHours(8)->toDateTimeString(),
+                    'expires' => Time::now()->addSeconds(60)->getTimestamp(),
+                    'expires_date' => Time::now()->addSeconds(60)->toDateTimeString(),
                 ],
                 'refresh_token' => [
                     'token' => $refreshToken,
-                    'expires' => Time::now()->addDays(7)->getTimestamp(),
-                    'expires_date' => Time::now()->addDays(7)->toDateTimeString(),
+                    'expires' => Time::now()->addHours(2)->getTimestamp(),
+                    'expires_date' => Time::now()->addHours(2)->toDateTimeString(),
                 ],
             ]);
         }
@@ -116,14 +116,14 @@ class AuthController extends ResourceController
         $accessToken = $this->jwt->generateToken([
             'id' => $user['id'],
             'iat' => now(),
-            'exp' => Time::now()->addHours(8)->getTimestamp(),
+            'exp' => Time::now()->addSeconds(60)->getTimestamp(),
         ]);
 
 
         $idInsert = $this->autorizacionTokenModel->insert([
             'token' => $accessToken,
             'usuario_id' => $user['id'],
-            'expira_el' => Time::now()->addHours(8)->toDateTimeString(),
+            'expira_el' => Time::now()->addSeconds(60)->toDateTimeString(),
             'esta_activo' => 1,
             'tipo' => 'access',
         ]);
@@ -135,8 +135,8 @@ class AuthController extends ResourceController
         return $this->respond([
             'access_token' => [
                 'token' => $accessToken,
-                'expires' => Time::now()->addHours(8)->getTimestamp(),
-                'expires_date' => Time::now()->addHours(8)->toDateTimeString(),
+                'expires' => Time::now()->addSeconds(60)->getTimestamp(),
+                'expires_date' => Time::now()->addSeconds(60)->toDateTimeString(),
 
             ]
         ]);
